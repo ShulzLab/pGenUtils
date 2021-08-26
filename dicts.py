@@ -7,7 +7,8 @@ Created on Mon Aug 23 14:24:59 2021
 
 def keep_matched_keys(dict_to_modify,source_dict):
     """
-    Keeps the keys of a dict where they have the same name as the keys in a source dictionnary.
+    Drops only the keys of a dict that do **not** have the same name as the keys in a source dictionnary.
+    Return dictionnary containing the rest.
 
     Args:
         dict_to_modify (TYPE): DESCRIPTION.
@@ -23,7 +24,8 @@ def keep_matched_keys(dict_to_modify,source_dict):
 
 def drop_matched_keys(dict_to_modify,source_dict):
     """
-    Drops the keys of a dict where they have the same name as the keys in a source dictionnary.
+    Drops all the keys of a dict that have the same name as the keys in a source dictionnary.
+    Return dictionnary containing the rest.
 
     Args:
         dict_to_modify (TYPE): DESCRIPTION.

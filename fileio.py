@@ -172,74 +172,74 @@ class ConfigFile(TwoLayerDict):
             pass
         return False
 
-def __FilepathResolverConfigFile(file_path,**kwargs):
-    foldup = kwargs.get("foldup",False)
-    if foldup :
-        file_path = UpFolder(file_path,foldup)
-    filename = kwargs.get("filename","config.txt")
-    if filename != "config.txt" or os.path.splitext(file_path)[0] == file_path :
-        file_path = os.path.join(file_path, filename)
+# def __FilepathResolverConfigFile(file_path,**kwargs):
+#     foldup = kwargs.get("foldup",False)
+#     if foldup :
+#         file_path = UpFolder(file_path,foldup)
+#     filename = kwargs.get("filename","config.txt")
+#     if filename != "config.txt" or os.path.splitext(file_path)[0] == file_path :
+#         file_path = os.path.join(file_path, filename)
 
-    if not os.path.isfile(file_path) :
-        raise OSError(f"File not found : {file_path}")
+#     if not os.path.isfile(file_path) :
+#         raise OSError(f"File not found : {file_path}")
 
-    return file_path
+#     return file_path
 
-def GetAllParamsConfigFile(file_path,section,**kwargs):
-    file_path = __FilepathResolverConfigFile(file_path,**kwargs)
-    cfg = configparser.ConfigParser()
-    cfg.read(file_path)
-    return cfg.options(section)
+# def GetAllParamsConfigFile(file_path,section,**kwargs):
+#     file_path = __FilepathResolverConfigFile(file_path,**kwargs)
+#     cfg = configparser.ConfigParser()
+#     cfg.read(file_path)
+#     return cfg.options(section)
 
-def GetAllSectionsConfigFile(file_path,**kwargs):
-    file_path = __FilepathResolverConfigFile(file_path,**kwargs)
-    cfg = configparser.ConfigParser()
-    cfg.read(file_path)
-    return cfg.sections()
+# def GetAllSectionsConfigFile(file_path,**kwargs):
+#     file_path = __FilepathResolverConfigFile(file_path,**kwargs)
+#     cfg = configparser.ConfigParser()
+#     cfg.read(file_path)
+#     return cfg.sections()
 
-def CheckConfigFile(file_path,sections,**kwargs):
-    file_path = __FilepathResolverConfigFile(file_path,**kwargs)
-    cfg = configparser.ConfigParser()
-    cfg.read(file_path)
+# def CheckConfigFile(file_path,sections,**kwargs):
+#     file_path = __FilepathResolverConfigFile(file_path,**kwargs)
+#     cfg = configparser.ConfigParser()
+#     cfg.read(file_path)
 
-    if not isinstance(sections , list):
-        sections = [sections]
+#     if not isinstance(sections , list):
+#         sections = [sections]
 
-    for section in sections :
-        if not cfg.has_section(section):
-            cfg.add_section(section)
+#     for section in sections :
+#         if not cfg.has_section(section):
+#             cfg.add_section(section)
 
-    with open(file_path, "w") as file_handle :
-        cfg.write(file_handle)
+#     with open(file_path, "w") as file_handle :
+#         cfg.write(file_handle)
 
-def LoadConfigFile(file_path,section,param,**kwargs):
-    file_path = __FilepathResolverConfigFile(file_path,**kwargs)
-    cfg = configparser.ConfigParser()
-    cfg.read(file_path)
-    try :
-        val =  json.loads(cfg.get(section,param))
-    except configparser.NoOptionError:
-        return None
-    if isinstance(val,str):
-        if val[0:1] == "f" :
-            val = val.replace("''",'"')
-    if isinstance(val,list):
-        if len(val) == 2 :
-            if val[0] == "np.ndarray":
-                import numpy as np
-                val = np.array(val[1])
-    return val
+# def LoadConfigFile(file_path,section,param,**kwargs):
+#     file_path = __FilepathResolverConfigFile(file_path,**kwargs)
+#     cfg = configparser.ConfigParser()
+#     cfg.read(file_path)
+#     try :
+#         val =  json.loads(cfg.get(section,param))
+#     except configparser.NoOptionError:
+#         return None
+#     if isinstance(val,str):
+#         if val[0:1] == "f" :
+#             val = val.replace("''",'"')
+#     if isinstance(val,list):
+#         if len(val) == 2 :
+#             if val[0] == "np.ndarray":
+#                 import numpy as np
+#                 val = np.array(val[1])
+#     return val
 
-def WriteToConfigFile(file_path,section,param,value,**kwargs):
-    file_path = __FilepathResolverConfigFile(file_path,**kwargs)
-    cfg = configparser.ConfigParser()
-    cfg.read(file_path)
-    if (value.__class__.__module__, value.__class__.__name__) == ('numpy', 'ndarray'):
-        value = ["np.ndarray", value.tolist()]
-    cfg.set(section, param , json.dumps(value))
+# def WriteToConfigFile(file_path,section,param,value,**kwargs):
+#     file_path = __FilepathResolverConfigFile(file_path,**kwargs)
+#     cfg = configparser.ConfigParser()
+#     cfg.read(file_path)
+#     if (value.__class__.__module__, value.__class__.__name__) == ('numpy', 'ndarray'):
+#         value = ["np.ndarray", value.tolist()]
+#     cfg.set(section, param , json.dumps(value))
 
-    with open(file_path, "w") as file_handle :
-        cfg.write(file_handle)
+#     with open(file_path, "w") as file_handle :
+#         cfg.write(file_handle)
 
 if __name__ == "__main__":
 

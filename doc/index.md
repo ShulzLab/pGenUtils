@@ -28,7 +28,8 @@ bar = foo()
 ```
 
 !!! Note:
-    In many packages depending on this library, LibUtils is imported as luti, for shorter reference.
+    In many packages depending on this library, LibUtils is imported as
+    luti, for shorter reference.
 
 __________
 
