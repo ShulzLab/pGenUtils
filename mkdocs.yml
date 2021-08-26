@@ -1,0 +1,155 @@
+# CustomLibs
+
+site_name: pLabUtils Documentation
+site_description: 'Documentation for the custom package pLabUtils'
+site_author: 'Timothe'
+site_url: 'https://josttim.github.io/pLabUtils/'
+
+repo_name: 'pLabUtils'
+repo_url: 'https://github.com/JostTim/pLabUtils'
+edit_uri: ''
+
+copyright: '&copy; 2021 Timothe'
+
+use_directory_urls: false
+
+docs_dir: 'doc'
+
+theme:
+    name: 'material'
+    palette :
+    
+        - scheme: default
+          toggle:
+            icon: material/toggle-switch-off-outline
+            name: Switch to dark mode
+        - scheme: slate
+          primary: deep orange
+          accent: teal
+          toggle:
+            icon: material/toggle-switch
+            name: Switch to light mode
+            
+    features:
+        - navigation.tabs
+        - navigation.instant
+        - navigation.top
+    highlightjs : true
+    hljs_languages :
+        - python
+        - c++
+        - c
+        - html
+        - css
+        - cmd
+
+markdown_extensions:
+  #- navigation.instant
+  - meta
+  - admonition
+  - codehilite
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - footnotes
+  - admonition
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+plugins:
+    - search
+    #- autorefs
+    - mkdocstrings :
+        handlers:
+          python:
+            rendering:
+              show_category_heading : false
+              show_source: false
+              show_if_no_docstring : true
+              show_signature_annotations : true
+              #show_root_heading : false
+              heading_level : 2
+            selection:
+              #docstring_style: google  # this is the default
+              #docstring_options:
+                #replace_admonitions: yes 
+              filters:
+                - "!^_"  # exlude all members starting with _
+                - "^__init__$"  # but always include __init__ modules and methods
+                - '!^"""Boilerplate:$'
+                - "!^@property"
+    
+nav:
+    - Usage: index.md
+    - code_doc: 
+        - 'mkds_pyfile_parser': 'code_doc\mkds_pyfile_parser.md'
+        - 'mkds_markdown_indexfile': 'code_doc\mkds_markdown_indexfile.md'
+        - 'mkds_mod_mkdocs_yml_archi': 'code_doc\mkds_mod_mkdocs_yml_archi.md'
+        - 'mkds_markdownfile_content': 'code_doc\mkds_markdownfile_content.md'
+        - 'mkds_make_docfiles': 'code_doc\mkds_make_docfiles.md'
+    - dicts: 
+        - 'keep_matched_keys': 'dicts\keep_matched_keys.md'
+        - 'drop_matched_keys': 'dicts\drop_matched_keys.md'
+    - extern: 
+        - 'empty_df': 'extern\empty_df.md'
+    - fileio: 
+        - 'Pickle': 'fileio\Pickle.md'
+        - 'ConfigFile': 'fileio\ConfigFile.md'
+        - '__FilepathResolverConfigFile': 'fileio\__FilepathResolverConfigFile.md'
+        - 'GetAllParamsConfigFile': 'fileio\GetAllParamsConfigFile.md'
+        - 'GetAllSectionsConfigFile': 'fileio\GetAllSectionsConfigFile.md'
+        - 'CheckConfigFile': 'fileio\CheckConfigFile.md'
+        - 'LoadConfigFile': 'fileio\LoadConfigFile.md'
+        - 'WriteToConfigFile': 'fileio\WriteToConfigFile.md'
+    - geometry: 
+        - 'UPoint': 'geometry\UPoint.md'
+        - 'ULine': 'geometry\ULine.md'
+        - 'UPointCollection': 'geometry\UPointCollection.md'
+        - 'ULineCollection': 'geometry\ULineCollection.md'
+        - 'UGetAngle': 'geometry\UGetAngle.md'
+        - 'removenans': 'geometry\removenans.md'
+        - 'UChgtVar': 'geometry\UChgtVar.md'
+        - 'orth_change': 'geometry\orth_change.md'
+        - 'AngleWrapper': 'geometry\AngleWrapper.md'
+        - 'Corner_detection': 'geometry\Corner_detection.md'
+        - 'Distance': 'geometry\Distance.md'
+        - 'Distances': 'geometry\Distances.md'
+        - 'Means': 'geometry\Means.md'
+        - 'get_angle': 'geometry\get_angle.md'
+        - 'Trajectory_Window': 'geometry\Trajectory_Window.md'
+    - iters: 
+        - 'unique_pairs': 'iters\unique_pairs.md'
+        - 'nest_iter': 'iters\nest_iter.md'
+    - network: 
+        - 'OpenSQL': 'network\OpenSQL.md'
+        - 'isOpen': 'network\isOpen.md'
+        - 'local_roots': 'network\local_roots.md'
+        - 'distant_roots': 'network\distant_roots.md'
+        - 'find_favoritesRootFolder': 'network\find_favoritesRootFolder.md'
+        - 'find_activeSQL': 'network\find_activeSQL.md'
+    - path: 
+        - 'is_or_makedir': 'path\is_or_makedir.md'
+        - 'remove_common_prefix': 'path\remove_common_prefix.md'
+        - 'SwitchRoot': 'path\SwitchRoot.md'
+        - 'GetMostRecentFile': 'path\GetMostRecentFile.md'
+        - 'UpFolder': 'path\UpFolder.md'
+        - 'folder_search': 'path\folder_search.md'
+        - 're_folder_search': 'path\re_folder_search.md'
+        - 'GetVersionnedPickles': 'path\GetVersionnedPickles.md'
+        - 'BinarySearch': 'path\BinarySearch.md'
+    - strings: 
+        - 'alphanum_sort': 'strings\alphanum_sort.md'
+        - 'quick_regexp': 'strings\quick_regexp.md'
+        - 'greek': 'strings\greek.md'
+    - structs: 
+        - 'sdict': 'structs\sdict.md'
+        - 'sdict': 'structs\sdict.md'
+        - 'TwoLayerDict': 'structs\TwoLayerDict.md'
+        - 'func_io_typematch': 'structs\func_io_typematch.md'
+        - 'get_properties_names': 'structs\get_properties_names.md'
+    - UX: 
+        - 'CachedVariables': 'UX\CachedVariables.md'
+        - 'ProgressBarImage': 'UX\ProgressBarImage.md'
+        - 'sizeof_fmt': 'UX\sizeof_fmt.md'

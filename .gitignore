@@ -112,3 +112,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.assets/custom_cmap.png
+.assets/out.png
+*.stats
