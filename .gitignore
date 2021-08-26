@@ -115,3 +115,5 @@ dmypy.json
 .assets/custom_cmap.png
 .assets/out.png
 *.stats
+
+*__varcache__
