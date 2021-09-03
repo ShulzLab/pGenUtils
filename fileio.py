@@ -7,7 +7,7 @@ Created on Mon Jun  7 15:37:56 2021
 
 
 import os, sys
-import pickle as realpicke
+import pickle as _pickle
 import configparser, json
 
 #sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath("__filename__"))))
@@ -25,7 +25,7 @@ class Pickle():
             with open(self.path,"rb") as f :
                 while True :
                     try :
-                        results.append(realpicke.load(f))
+                        results.append(_pickle.load(f))
                     except EOFError :
                         break
                 return results if len(results) > 1 else results[0]
@@ -36,9 +36,9 @@ class Pickle():
         with open(self.path,"wb") as f :
             if isinstance(data, (list,tuple)) and not noiter:
                 for item in data :
-                    realpicke.dump(item,f)# protocol = realpicke.HIGHEST_PROTOCOL ?
+                    _pickle.dump(item,f)# protocol = _pickle.HIGHEST_PROTOCOL ?
                 return None
-            realpicke.dump(data,f)
+            _pickle.dump(data,f)
 
 class ConfigFile(TwoLayerDict):
     def __init__(self, path, **kwargs):

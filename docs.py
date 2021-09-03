@@ -15,10 +15,11 @@ Created on Wed Aug 25 10:40:20 2021
 """
 
 import os, sys
-import path as pathutils
 from warnings import warn
-import strings
 import ast
+
+import pathes
+import strings
 
 _EXCLUDE_BALISES = {"exclude_module":"EXCLUDE_MODULE_FROM_MKDOCSTRINGS","exclude_func_class":"EXCLUDE_FUNC_OR_CLASS_FROM_MKDOCSTRINGS"}
 
@@ -222,8 +223,8 @@ def mkds_make_docfiles(path : str) -> None:
         return _quoting(rel_path + ".md")
 
     docpath = os.path.join(path,"doc")
-    pathutils.is_or_makedir(docpath)
-    matched_py_files = pathutils.re_folder_search(path,r".\.py$")
+    pathes.is_or_makedir(docpath)
+    matched_py_files = pathes.re_folder_search(path,r".\.py$")
     yml_new_architecture = []
 
     for filepath in matched_py_files :
@@ -234,8 +235,8 @@ def mkds_make_docfiles(path : str) -> None:
         if not parser.is_empty():
 
             module_docpath = os.path.join(docpath,parser.modulename)
-            pathutils.is_or_makedir(module_docpath)
-            matched_md_files = pathutils.re_folder_search(module_docpath,r".\.md$")
+            pathes.is_or_makedir(module_docpath)
+            matched_md_files = pathes.re_folder_search(module_docpath,r".\.md$")
             if matched_md_files is not None :
                 for md_file_path in matched_md_files:
                     os.remove(md_file_path)
@@ -261,6 +262,6 @@ def mkds_make_docfiles(path : str) -> None:
 
 if __name__ == "__main__" :
 
-    test_path = r"C:\Users\Timothe\NasgoyaveOC\Professionnel\TheseUNIC\DevScripts\Python\__packages__\pLabUtils"
+    test_path = r"C:\Users\Timothe\NasgoyaveOC\Professionnel\TheseUNIC\DevScripts\Python\__packages__\pGenUtils"
 
     mkds_make_docfiles(test_path)

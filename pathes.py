@@ -20,26 +20,70 @@ Created on Tue Aug 24 15:33:04 2021
 import os, warnings
 import strings
 
-def is_or_makedir(path):
-    if os.path.splitext(path)[1] == '':
-        if not os.path.isdir(path):
-            os.makedirs(path)
+def is_or_makedir(input_path):
+    """
+    Search for a directory. Does nothing if it exists. Create it otherwise (and the subfolders necessary to make the arborescence complete)
+
+    Args:
+        input_path (str): Path to the directory to be checked or created.
+
+    Returns:
+        Always returns None.
+
+    """
+    if os.path.splitext(input_path)[1] == '':
+        if not os.path.isdir(input_path):
+            os.makedirs(input_path)
     else :
-        warnings.warn("The path is not a directory")
+        warnings.warn("The input_path is not a directory")
 
 def remove_common_prefix(input_path, common_root_base):
+    """
+    Compare an input path and a path with a common root with the input path, and returns only the part of the input path that is not shared with the _common_root_path.
+    *Previously named RemoveCommonPrefix*
+
+    Args:
+        input_path (TYPE): DESCRIPTION.
+        common_root_base (TYPE): DESCRIPTION.
+
+    Returns:
+        TYPE: DESCRIPTION.
+
+    """
     return os.path.relpath(input_path,os.path.commonprefix((common_root_base,input_path)))
 
-def SwitchRoot(path ,original_root , new_root):
+def switch_root(input_path, original_root, new_root):
+    """
+    Processed a path to a destination with an "original_root", and replaces this root, if shared with the input_path, for the new root (entirely included).
+    *Previously named SwitchRoot*
+
+    Args:
+        input_path (TYPE): DESCRIPTION.
+        original_root (TYPE): DESCRIPTION.
+        new_root (TYPE): DESCRIPTION.
+
+    Returns:
+        TYPE: DESCRIPTION.
+    """
     try :
-        arborescence = RemoveCommonPrefix(path, original_root)
+        arborescence = remove_common_prefix(input_path, original_root)
     except ValueError :
-        return path
-    if path == arborescence :
-        return path
+        return input_path
+    if input_path == arborescence :
+        return input_path
     return os.path.join(new_root,arborescence)
 
-def GetMostRecentFile(filelist):
+def get_most_recent_file(filelist):
+    """
+    *Previously named GetMostRecentFile*
+
+    Args:
+        filelist (list tuple): List of file paths from wich to search the most recent one.
+
+    Returns:
+        most_recent_file (str): Path to the most recent file.
+
+    """
     import numpy as np
     times = []
     for file in filelist :
@@ -47,11 +91,22 @@ def GetMostRecentFile(filelist):
     most_recent_file = filelist[np.argmax(times)]
     return most_recent_file
 
-def UpFolder(path,steps):
+def up_folder(input_path,steps):
+    """Returns the input_path where we removed the deepest folders, N times.
+    *Previously named UpFolder*
+
+    Args:
+        input_path (str): DESCRIPTION.
+        steps (int): N * stemps is the number of folders removed from the base of the path.
+
+    Returns:
+        TYPE: DESCRIPTION.
+
+    """
     import os
     for i in range(steps) :
-        path = os.path.join(path ,"..")
-    return os.path.abspath(path)
+        input_path = os.path.join(input_path ,"..")
+    return os.path.abspath(input_path)
 
 def folder_search(MainInputFolder,VideoName):
     """

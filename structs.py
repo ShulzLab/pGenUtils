@@ -248,6 +248,8 @@ def get_properties_names(cls):
 
 
 class func_io_typematch():
+    """Converts a type back to the one it had entering a function.
+    """
     def __init__(self,*args):
         self.casts = [type(arg) for arg in args]
 

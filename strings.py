@@ -8,6 +8,7 @@ Created on Tue Mar 31 02:02:57 2020
 
 import re
 import numpy as np
+
 from structs import func_io_typematch
 
 # list based functions
