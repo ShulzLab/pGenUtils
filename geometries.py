@@ -11,7 +11,8 @@ from statistics import mean
 
 try :
     from shapely.geometry import LineString
-except ImportError as e:
+except (ImportError, FileNotFoundError) as e:
+    warnings.warn(f"Shapely import failed Either not installed or some .dll files mising. You won't be able to use Trajectory_Window function. Original error : {e}")
     LineString = e
 
 try :
