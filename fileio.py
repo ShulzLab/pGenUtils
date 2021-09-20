@@ -77,6 +77,12 @@ class ConfigFile(TwoLayerDict):
         super(TwoLayerDict, self).__init__({})
         self._read_if_changed()
 
+    def couples(self):
+        sections = self.sections()
+        result = []
+        [ result.extend( [ ( section, param ) for param in self.params(section) ] ) for section in sections ]
+        return tuple(result)
+
     def sections(self):
         return self.cfg.sections()
 
@@ -247,7 +253,7 @@ if __name__ == "__main__":
 
 
 
-    sys.exit()
+    #sys.exit()
 
 
     import numpy as np
@@ -258,3 +264,5 @@ if __name__ == "__main__":
     test["flee","moulaga"]=142.13
     test["flee","ratata"]= np.array([[1,3],[4,56]])
     print(test["flee","ratata"])
+
+    print(test.couples())

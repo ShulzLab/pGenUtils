@@ -29,7 +29,7 @@ def empty_df(columns, dtypes=[], index=None):
     """
     df = pd.DataFrame(index=index)
 
-    if ( type(dtypes) == list or type(dtypes) == tuple ) and len(columns)==len(dtypes):
+    if ( type(dtypes) == list or type(dtypes) == tuple) and len(columns)==len(dtypes):
         for c,d in zip(columns, dtypes):
             df[c] = pd.Series(dtype=d)
     else :

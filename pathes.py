@@ -20,6 +20,10 @@ Created on Tue Aug 24 15:33:04 2021
 import os, warnings
 import strings
 
+def separate_path_components(input_path):
+    input_path = os.path.normpath(input_path)
+    return input_path.split(os.sep)
+
 def is_or_makedir(input_path):
     """
     Search for a directory. Does nothing if it exists. Create it otherwise (and the subfolders necessary to make the arborescence complete)
@@ -50,7 +54,7 @@ def remove_common_prefix(input_path, common_root_base):
         TYPE: DESCRIPTION.
 
     """
-    return os.path.relpath(input_path,os.path.commonprefix((common_root_base,input_path)))
+    return os.path.relpath(os.path.normpath(input_path),os.path.commonprefix((os.path.normpath(common_root_base),os.path.normpath(input_path))))
 
 def switch_root(input_path, original_root, new_root):
     """
@@ -108,7 +112,7 @@ def up_folder(input_path,steps):
         input_path = os.path.join(input_path ,"..")
     return os.path.abspath(input_path)
 
-def folder_search(MainInputFolder,VideoName):
+def folder_search(input_folder,file_name):
     """
     Scans a folder an returns a list of the paths to files that match the requirements. The matching is litteral.
     *Previously named Foldersearch*
@@ -117,29 +121,29 @@ def folder_search(MainInputFolder,VideoName):
         It is just returning rigidly the files that **exaclty** match the path entered. Prefer re_folder_search for a more flexible scan using regular expressions.
 
     Args:
-        MainInputFolder (str): Root path from wich to search deeper.
-        VideoName (str): A name of folder or file located in any subfolders (max recursion depth : 1) of the MainInputFolder.
+        input_folder (str): Root path from wich to search deeper.
+        file_name (str): A name of folder or file located in any subfolders (max recursion depth : 1) of the input_folder.
 
     Returns:
         NewDirlist (list): List of dirs matching the requirement.
     """
-    DirList = os.listdir(MainInputFolder)
+    DirList = os.listdir(input_folder)
     DirList.append(".")
     NewDirlist=[]
     for Subdir in DirList:
         print(Subdir)
-        if os.path.exists(os.path.join(MainInputFolder,Subdir,VideoName)):
-            NewDirlist.append(os.path.abspath(os.path.join(MainInputFolder,Subdir,VideoName)))
+        if os.path.exists(os.path.join(input_folder,Subdir,file_name)):
+            NewDirlist.append(os.path.abspath(os.path.join(input_folder,Subdir,file_name)))
     return NewDirlist
 
 
-def re_folder_search(MainInputFolder, regexp, **kwargs):
+def re_folder_search(input_folder, regexp, **kwargs):
     """
     Scans a folder an returns a list of the paths to files that matched the requirements. Uses regular expressions.
     *Previously named RegFileSearch*
 
     Args:
-        MainInputFolder (TYPE): DESCRIPTION.
+        input_folder (TYPE): DESCRIPTION.
         regexp (TYPE): DESCRIPTION.
         **kwargs (optional): DESCRIPTION.
 
@@ -147,7 +151,7 @@ def re_folder_search(MainInputFolder, regexp, **kwargs):
         list none : DESCRIPTION.
 
     """
-    File_List = os.listdir(MainInputFolder)
+    File_List = os.listdir(input_folder)
     if "checkfile" in kwargs:
         #Care : this function considerably slows down the process and is only
         #necessary in multifolder search
@@ -157,7 +161,7 @@ def re_folder_search(MainInputFolder, regexp, **kwargs):
     if checkfile:
         check_list = []
         for f in File_List:
-            if os.path.isfile(os.path.join(MainInputFolder, f)):
+            if os.path.isfile(os.path.join(input_folder, f)):
                 print("Checked")
                 check_list.append(f)
         File_List = check_list
@@ -165,7 +169,7 @@ def re_folder_search(MainInputFolder, regexp, **kwargs):
     NewDirlist=[]
     for File in File_List:
         if strings.quick_regexp(File,regexp):
-            NewDirlist.append(os.path.join(MainInputFolder,File))
+            NewDirlist.append(os.path.join(input_folder,File))
 
     if len(NewDirlist) == 0 :
         return None
