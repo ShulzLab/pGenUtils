@@ -20,6 +20,19 @@ Created on Tue Aug 24 15:33:04 2021
 import os, warnings
 import strings
 
+def list_recursive_files(input_path, condition = "True"):
+    #condition = "os.path.splitext(f)[1] != '.txt'"
+    return [os.path.join(dp, f) for dp, dn, filenames in os.walk(input_path) for f in filenames if eval(condition)]
+
+def list_recursive_dirs(input_path, condition = "True"):
+    return [os.path.join(dp, d) for dp, dirnames, fn in os.walk(input_path) for d in dirnames if eval(condition)]
+
+def list_toplevel_dirs(input_path):
+    return [ os.path.join(input_path,name) for name in os.listdir(input_path) if os.path.isdir(os.path.join(input_path, name)) ]
+
+def list_toplevel_files(input_path):
+    return [ os.path.join(input_path,name) for name in os.listdir(input_path) if os.path.isfile(os.path.join(input_path, name)) ]
+
 def separate_path_components(input_path):
     input_path = os.path.normpath(input_path)
     return input_path.split(os.sep)
