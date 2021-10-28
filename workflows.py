@@ -17,7 +17,28 @@ try :
 except TypeError as e :
     warnings.warn("numpy installation was not detected, some functions from workflow module will be deactivated")
     np = e
-
+    
+# @dataclass
+# class Point:
+#     x: float
+#     y: float
+#     z: float = 0.0
+    
+    
+def get_currentfile_git_repo_metadata(input_path = None):
+    if input_path is None :
+        input_path = inspect.stack()[1][1]
+        if 'ipython' in input_path and input_path[0] == '<':
+            raise NameError("cannot get file path of current executed script from a jupyter call; ")
+    import git
+    try :
+        repo = git.Repo(input_path, search_parent_directories=True)
+    except git.InvalidGitRepositoryError :
+        warnings.warn(f"No git repository was found here or upstream : {input_path}")
+        return None
+    repo_data = {"file_called" : input_path,"path_on_disk":repo.git_dir, "name":repo.remotes.origin.url.split('.git')[0].split('/')[-1], "branch": repo.active_branch.name, "author": repo.remotes.origin.url.split('.git')[0].split('/')[-2], "commit": repo.active_branch.commit.hexsha, "commiter": repo.active_branch.commit.committer.name, "commiter_email": repo.active_branch.commit.committer.email}
+    return repo_data
+    
 class CachedVariables(ConfigFile):
 
     @property

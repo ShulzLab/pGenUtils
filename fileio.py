@@ -133,11 +133,14 @@ class ConfigFile(TwoLayerDict):
                 return value
             return array
 
+        def ini_compat_json_dumps(_value):
+            return json.dumps(_value.replace("%","%%"))
+
         self._create_sections()
         for section in self.keys():
             for param in super().__getitem__((section,slice(None))).keys():
                 value = jsonize_if_np_array(super().__getitem__((section,param)))
-                self.cfg.set(section,param,json.dumps(value))
+                self.cfg.set(section,param,ini_compat_json_dumps(value))
         with open(self.path, 'w') as configfile:
             self.cfg.write(configfile)
 
@@ -285,9 +288,9 @@ if __name__ == "__main__":
 
     import sys
 
-
-
-    #sys.exit()
+    test = ConfigFile(r"\\157.136.60.15\EqShulz\Timothe\DATA\BehavioralVideos\Whole_area\Low_speed_triggered\gateway.ini")
+    print(test["outer_architecture","dateformat"])
+    sys.exit()
 
 
     import numpy as np
