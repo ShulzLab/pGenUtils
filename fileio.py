@@ -9,10 +9,17 @@ Created on Mon Jun  7 15:37:56 2021
 import os, sys
 import pickle as _pickle
 import configparser, json
+import shutil, pathlib
 
 #sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath("__filename__"))))
 #print(os.path.dirname(os.path.dirname(os.path.abspath("__name__"))))
 from structs import TwoLayerDict
+import pathes
+
+
+
+
+
 
 class Pickle():
 
@@ -77,6 +84,12 @@ class ConfigFile(TwoLayerDict):
         super(TwoLayerDict, self).__init__({})
         self._read_if_changed()
 
+    def couples(self):
+        sections = self.sections()
+        result = []
+        [ result.extend( [ ( section, param ) for param in self.params(section) ] ) for section in sections ]
+        return tuple(result)
+
     def sections(self):
         return self.cfg.sections()
 
@@ -120,11 +133,14 @@ class ConfigFile(TwoLayerDict):
                 return value
             return array
 
+        def ini_compat_json_dumps(_value):
+            return json.dumps(_value.replace("%","%%"))
+
         self._create_sections()
         for section in self.keys():
             for param in super().__getitem__((section,slice(None))).keys():
                 value = jsonize_if_np_array(super().__getitem__((section,param)))
-                self.cfg.set(section,param,json.dumps(value))
+                self.cfg.set(section,param,ini_compat_json_dumps(value))
         with open(self.path, 'w') as configfile:
             self.cfg.write(configfile)
 
@@ -171,6 +187,33 @@ class ConfigFile(TwoLayerDict):
         except FileNotFoundError :
             pass
         return False
+
+
+def paste_dir_content(src, dst, include_root_files : bool = True , copy : bool = True ):
+    def recursive_copy(s,d, symlinks=False, ignore=None):
+        try :
+            shutil.copytree(s, d, symlinks, ignore) if os.path.isdir(s) else shutil.copy2(s, d)
+        except FileExistsError :
+            pass
+
+    operating_function = recursive_copy if copy else shutil.move
+
+    if pathlib.Path(src).drive == pathlib.Path(dst).drive :
+        def produce_distant_path(src_name):
+            return pathes.switch_root(src_name,src,dst)
+    else :
+        def produce_distant_path(src_name):
+            return os.path.join(dst, pathes.remove_common_prefix(src_name,src))
+
+    def operate_on_items(item_producing_function):
+        for src_item in item_producing_function(src):
+            dst_item = produce_distant_path(src_item)
+            pathes.is_or_makedir(os.path.dirname(dst_item))
+            operating_function(src_item, dst_item)
+
+    operate_on_items(pathes.list_toplevel_dirs)
+    if include_root_files :
+        operate_on_items(pathes.list_toplevel_files)
 
 # def __FilepathResolverConfigFile(file_path,**kwargs):
 #     foldup = kwargs.get("foldup",False)
@@ -245,16 +288,18 @@ if __name__ == "__main__":
 
     import sys
 
-
-
+    test = ConfigFile(r"\\157.136.60.15\EqShulz\Timothe\DATA\BehavioralVideos\Whole_area\Low_speed_triggered\gateway.ini")
+    print(test["outer_architecture","dateformat"])
     sys.exit()
 
 
     import numpy as np
     #test = ConfigFile(r"\\157.136.60.15\EqShulz\Timothe\DATA\DataProcessing\Expect_3_mush\CrossAnimals\SpatialScale\scale.txt")
     test = ConfigFile(r"test.config")
-    test["foo","zob"]=12
+    test["foo","zbo"]=12
     test["foo","zbi"]="adas"
     test["flee","moulaga"]=142.13
     test["flee","ratata"]= np.array([[1,3],[4,56]])
     print(test["flee","ratata"])
+
+    print(test.couples())
