@@ -1,7 +1,5 @@
 on: ​push​
-  ​paths​:
-    - ​**.md
-    - "mkdocs.yml"
+
 jobs:
   build​:
     runs-on​: ​ubuntu-latest​
