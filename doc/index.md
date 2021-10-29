@@ -39,14 +39,14 @@ __________
 
 ### Data manipulation modules 
 
-  - for [Geometry](geometry\ULine.md) - ``geometry`` module
+  - for [Geometry](geometries\ULine.md) - ``geometry`` module
 - for [Strings](strings\alphanum_sort.md) - ``strings`` module
 - for [Dictionnaries](dicts\drop_matched_keys.md) - ``dicts`` module
 - for [Iterators and generators](iters\nest_iter.md) - ``iters`` module
 
 **<u>For external libraries types :</u>** ( ``extern`` module)
 
-- for [pandas.dataframes](extern\empty_df.md#pandas)
+- for [pandas.dataframes](externs\empty_df.md#pandas)
 
 **<u>General purpose custom types structures :</u>**
 
@@ -54,8 +54,8 @@ __________
 
 ### User workflow enhancement modules
 
-- [user experience](UX\cached_execution_variables.md) ``UX`` module
-- local [network](network\find_activeSQL.md) utility ``network`` module
+- [user experience](workflows\CachedVariables.md) ``workflows`` module
+- local [network](networks\StaticSQLEngine.md) utility ``network`` module
 - [file input output](fileio\Pickle.md) utility - ``fileio`` module
 
 
