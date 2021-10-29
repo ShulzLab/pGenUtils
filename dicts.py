@@ -5,7 +5,7 @@ Created on Mon Aug 23 14:24:59 2021
 @author: Timothe
 """
 
-def keep_matched_keys(dict_to_modify,source_dict):
+def keep_matched_keys(dict_to_modify,model_keys):
     """
     Drops only the keys of a dict that do **not** have the same name as the keys in a source dictionnary.
     Return dictionnary containing the rest.
@@ -18,9 +18,10 @@ def keep_matched_keys(dict_to_modify,source_dict):
         modified_dict (TYPE): DESCRIPTION.
 
     """
-    modified_dict = dict_to_modify.copy()
-    modified_dict = { your_key: modified_dict[your_key] for your_key in source_dict.keys() if your_key != 'empty' and modified_dict.get(your_key) is not None }
-    return modified_dict
+    if isinstance(model_keys, dict) :
+        model_keys = set(model_keys.keys())
+
+    return { kept_key : dict_to_modify[kept_key] for kept_key in model_keys if kept_key != 'empty' and dict_to_modify.get(kept_key) is not None}
 
 def drop_matched_keys(dict_to_modify,source_dict):
     """
