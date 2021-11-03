@@ -21,11 +21,55 @@ import os, warnings
 import strings
 
 def list_recursive_files(input_path, condition = "True"):
-    #condition = "os.path.splitext(f)[1] != '.txt'"
-    return [os.path.join(dp, f) for dp, dn, filenames in os.walk(input_path) for f in filenames if eval(condition)]
+    """
+    Get full path of files from all folders under the ``input_path`` (including itself).
+    Can return specific files with optionnal conditions 
+
+    Args:
+        input_path (str): A valid path to a folder. 
+            This folder is used as the root to return files found (possible condition selection, see below).
+        condition (str, optional): String of pyton boolean comparisons, deciding if a result is kept or discarded. 
+            The default is "True", meaning every file will be kept in all recursive child folders.
+            The possible keywords (variables understood) for composing the boolean comparison are :
+                - input_path (the input given to the function)
+                - filename (the file found)
+                - filenames (files in a subfolder)
+                - dirnames (directories ina a subfolder)
+                - dirname (the current root (= a subfolder path) from wich filename and dirnames names are evaluated. 
+                  This changes with depth)
+            One can then add functions like ``os.path.splitext(filename)[1]`` to get file extension for example.
+            Imported packages available include strings.foo (all pGenUtils strings functions) warnings and os. 
+            Defaults to "True".
+
+    Returns:
+        list: List of the file fullpaths found under ``input_path`` folder and subfolders.
+    """
+    return [os.path.join(dirname, filename) for dirname, dirnames, filenames in os.walk(input_path) for filename in filenames if eval(condition)]
 
 def list_recursive_dirs(input_path, condition = "True"):
-    return [os.path.join(dp, d) for dp, dirnames, fn in os.walk(input_path) for d in dirnames if eval(condition)]
+    """
+    Get full path of directories from all folders under the ``input_path`` (including itself).
+    Can return specific directories with optionnal conditions 
+
+    Args:
+        input_path (str): A valid path to a folder. 
+            This folder is used as the root to return directories found (possible condition selection, see below).
+        condition (str, optional): String of pyton boolean comparisons, deciding if a result is kept or discarded. 
+            The default is "True", meaning every directory will be kept in all recursive child folders.
+            The possible keywords (variables understood) for composing the boolean comparison are :
+                - input_path (the input given to the function)
+                - dirname (the directory found)
+                - filenames (files in a subfolder)
+                - dirnames (directories in a subfolder)
+                - parent_dirname (the current root (= a subfolder path) from wich dirname is evaluated. 
+                  This changes with depth)
+            Imported packages available include strings.foo (all pGenUtils strings functions) warnings and os. 
+            Defaults to "True".
+
+    Returns:
+        list: List of the directories fullpaths found under ``input_path`` folder and subfolders.
+    """
+    return [os.path.join(parent_dirname, dirname) for parent_dirname, dirnames, filenames in os.walk(input_path) for dirname in dirnames if eval(condition)]
 
 def list_toplevel_dirs(input_path):
     return [ os.path.join(input_path,name) for name in os.listdir(input_path) if os.path.isdir(os.path.join(input_path, name)) ]
