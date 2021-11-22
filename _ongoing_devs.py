@@ -596,6 +596,15 @@ def test_fig_cache(fig):
     return fig_cache
 
 
+def dependancies_test_caller():
+    import _dependancies
+    _dependancies.dependancy_missing_warning("rasterio")
+    
+if __name__ is "__main__":
+    dependancies_test_caller()
+
+    sys.exit()
+
 if __name__ == "__main__":
 
     # import LibUtils
@@ -649,3 +658,4 @@ if __name__ == "__main__":
     # sys.exit(qApp.exec_())
 
     Figure()
+    

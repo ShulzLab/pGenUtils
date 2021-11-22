@@ -1,11 +1,11 @@
 # CustomLibs
 
-site_name: pLabUtils Documentation
+site_name: pGenUtils Documentation
 site_description: 'Documentation for the custom package pLabUtils'
 site_author: 'Timothe'
 site_url: 'https://josttim.github.io/pLabUtils/'
 
-repo_name: 'pLabUtils'
+repo_name: 'pGenUtils'
 repo_url: 'https://github.com/JostTim/pLabUtils'
 edit_uri: ''
 

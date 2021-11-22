@@ -4,8 +4,12 @@ Created on Mon Mar 30 17:48:42 2020
 
 @author: Timothe
 """
-import sys
-import numpy as np
+#import sys
+#import numpy as np
+
+
+def argmax(iterable):
+    return max(enumerate(iterable), key=lambda x: x[1])[0]
 
 def unique_pairs(a,b):
     """Produce pairs of values from two iterables"""

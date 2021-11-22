@@ -1,17 +1,26 @@
 name: Deploy
-on: ​push
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
-  build​:
+  build:
     name: Deploy docs to GitHub Pages
-    runs-on​: ​ubuntu-latest​
-    ​steps​:
-      - ​uses​: ​actions/checkout@v2
-      - ​uses​: ​actions/setup-python@v2​
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v2
+      - name: Build
+        uses: Tiryoh/actions-mkdocs@v0
         with:
-          python-version: '3.9'
-      - name: Installs pip
-        run: pip install --upgrade pip && pip install mkdocstrings && pip install mkdocs mkdocs-gen-files
-        run: git config user.name 'github-actions[bot]' && git config user.email 'github-actions[bot]@users.noreply.github.com'
-      - ​name​: ​Publish docs​
-        ​run​: mkdocs gh-deploy
+          mkdocs_version: 'latest' # option
+          #mkdocs_version: '1.1' # option
+          requirements: 'requirements.txt' # option
+          configfile: 'mkdocs.yml' # option
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
