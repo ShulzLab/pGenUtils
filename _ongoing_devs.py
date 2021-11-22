@@ -598,9 +598,10 @@ def test_fig_cache(fig):
 
 def dependancies_test_caller():
     import _dependancies
-    _dependancies.dependancy_missing_warning("rasterio")
+    _dependancies.dep_miss_raising(_dependancies.dependancy_placeholder("sqlalchemy"))
     
 if __name__ is "__main__":
+    import networks
     dependancies_test_caller()
 
     sys.exit()

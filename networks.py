@@ -12,14 +12,14 @@ import pathlib
 
 import strings
 from workflows import singleton
+import _dependancies as _deps
 
 #optionnal packages
 try :
     import sqlalchemy as sql
-except ImportError as e :
-    import warnings
-    warnings.warn("sqlalchemy installation was not detected, some functions from networks module will be deactivated")
-    sql = e
+except ImportError as e :          
+    sql = _deps.sql_placeholder("sqlalchemy",e)
+    _deps.dep_miss_warning(sql)
 
 @singleton
 class StaticSQLEngine(sql.engine.base.Engine):
@@ -29,6 +29,7 @@ class StaticSQLEngine(sql.engine.base.Engine):
     this existing instance will be returned instead of creating a new one, to save time.
     """
     def __init__(self,input_method):
+        _deps.assert_not_imported(sql)
         temp_engine = open_sql(input_method)
         super().__init__(temp_engine.pool,temp_engine.dialect,temp_engine.url)
 
@@ -46,8 +47,7 @@ def open_sql(input_method):
         engine (TYPE): DESCRIPTION.
 
     """
-    if isinstance(sql,ImportError):
-        raise sql("You must install sqlalchemy to be able to use this function")
+    _deps.assert_not_imported(sql)
     if not isinstance(input_method,str) : #
         input_method = input_method()
     engine = sql.create_engine(input_method)
