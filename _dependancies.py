@@ -95,6 +95,9 @@ class dependancy_placeholder(ImportError):
             self.package_selector = "default"
         else :
             self.package_selector = package_name
+        
+    def __bool__(self):
+        return False
             
 class sql_placeholder(dependancy_placeholder):
     class _1objclass(object):
@@ -108,7 +111,7 @@ class sql_placeholder(dependancy_placeholder):
         super().__init__(package_name, error)
         
 def assert_not_imported(package,raising = True):
-    if isinstance(package,dependancy_placeholder):
+    if not package :
         if raising:
             dep_miss_raising(package)
         return True

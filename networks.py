@@ -32,6 +32,28 @@ class StaticSQLEngine(sql.engine.base.Engine):
         _deps.assert_not_imported(sql)
         temp_engine = open_sql(input_method)
         super().__init__(temp_engine.pool,temp_engine.dialect,temp_engine.url)
+        
+        
+    def call_procedure(self,function_name, params):
+        def listify(var):
+            return [var] if not isinstance(var,(list,tuple)) else var
+        
+        from itertools import chain
+        import mysql.connector as mysql 
+        
+        params = listify(params)
+        cnx = self.raw_connection()
+        cursor = cnx.cursor()
+        try:
+            for result in cursor.execute( f"call {function_name}(%s);",params, multi = True ) :
+                try :
+                    records = result.fetchall()
+                except mysql.errors.InterfaceError:
+                    pass           
+        finally:
+            cursor.close()
+            cnx.close()
+        return list(chain(*records))
 
 
 def open_sql(input_method):

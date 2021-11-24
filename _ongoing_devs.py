@@ -8,6 +8,15 @@ Created on Tue Feb 16 19:25:15 2021
 </div>
 """
 
+from dataclasses import dataclass
+
+
+@dataclass
+class Point:
+    x: float
+    y: float
+    z: float = 0.0
+
 import os, sys
 
 uppath = lambda _path, n: os.sep.join(_path.split(os.sep)[:-n])
@@ -53,21 +62,6 @@ Created on Tue Nov 24 22:19:51 2020
 
 @author: Timothe
 """
-
-
-import yaml
-
-class DataEnvironment():
-
-    def __init__(self,path):
-
-        self.yaml_path = os.path.join(path,"data_environment.yaml")
-
-        with open(self.yaml_path, 'r') as stream:
-            try:
-                print(yaml.safe_load(stream))
-            except yaml.YAMLError as exc:
-                print(exc)
 
 
 
@@ -596,13 +590,9 @@ def test_fig_cache(fig):
     return fig_cache
 
 
-def dependancies_test_caller():
-    import _dependancies
-    _dependancies.dep_miss_raising(_dependancies.dependancy_placeholder("sqlalchemy"))
     
 if __name__ is "__main__":
-    import networks
-    dependancies_test_caller()
+
 
     sys.exit()
 
