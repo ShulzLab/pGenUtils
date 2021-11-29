@@ -101,7 +101,8 @@ class StaticSQLEngine(sql.engine.base.Engine):
                     except AttributeError:
                         df.columns = result.column_names
                 except self.mysql_cnx_errors.InterfaceError:
-                    pass           
+                    pass     
+                
         finally:
             cursor.close()
             cnx.close()
@@ -141,6 +142,9 @@ def open_sql(input_method):
 
     engine = sql.create_engine(input_method)
     return engine
+
+
+    
 
 def is_port_open(ip,port):
     """
