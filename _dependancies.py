@@ -39,6 +39,10 @@ _dependancies_data = {"default" :
                       "sqlalchemy":
                           {"installs" : ["conda install -c anaconda sqlalchemy","pip install SQLAlchemy"], 
                            "website" : "https://www.sqlalchemy.org/library.html#tutorials"},
+                          
+                      "pandas" :
+                        {"installs" : ["conda install -c anaconda pandas","pip install pandas"], 
+                           "website" : "https://pandas.pydata.org/getting_started.html"}
                       }
 
     
@@ -87,7 +91,7 @@ def dep_miss_raising(dep_placeholder):
     raise ImportError( called_dependancy_message(dep_placeholder) + str(dep_placeholder) + install_dependancy_message(dep_placeholder) )
     
     
-class dependancy_placeholder(ImportError):
+class default_placeholder(ImportError):
     def __init__(self, package_name , error = "" ):
         super().__init__(error)
         self.package_name = package_name
@@ -99,7 +103,7 @@ class dependancy_placeholder(ImportError):
     def __bool__(self):
         return False
             
-class sql_placeholder(dependancy_placeholder):
+class sql_placeholder(default_placeholder):
     class _1objclass(object):
         class _2objclass(object):
             class _3objclass(object):
