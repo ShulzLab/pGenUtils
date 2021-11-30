@@ -243,6 +243,17 @@ def GetVersionnedPickles(folder, analysis, version):
     return outfilelist
 
 def BinarySearch(InputFolder,extension):
+    """
+    USELESS, Redundant with 
+
+    Args:
+        InputFolder (TYPE): DESCRIPTION.
+        extension (TYPE): DESCRIPTION.
+
+    Returns:
+        NewDirlist (TYPE): DESCRIPTION.
+
+    """
     DirList = os.listdir(InputFolder)
     NewDirlist=[]
     try:

@@ -285,11 +285,11 @@ class splicedArray(np.ndarray):
             np.array: An array with no nan inside.
 
         """
-        self = self._recompute_npa
+        self = self._restore_splices
         return self.splices.unbuild(self)
 
     def __call__(self,array=None,fix_side = "end"):
-        self = self._recompute_npa
+        self = self._restore_splices
         if array is None :
             return self.splices.build(self)# this condition has no use by the way,
             # since we never set unbuild self in this class, when we do,
@@ -299,7 +299,7 @@ class splicedArray(np.ndarray):
         #at the end of the last numeral block if shape is shorter than original
 
     @property
-    def _recompute_npa(self):
+    def _restore_splices(self):
         #just a self check in case unpickling didn't called __new__ or
         #deserialization did weird things silently and splices attibute is gone
         try :

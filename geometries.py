@@ -255,14 +255,17 @@ else :
             return np.array(veclist)
 
         def to_line_collection(self,**kwargs):
-
-            linelist = []
-            for index in range(len(self.collection)-1):
-                linelist.append( [ self.collection[index].vec ,  self.collection[index+1].vec  ] )
-            arr = np.array(linelist)
-            if kwargs.get("removenans", False) :
-                arr = removenans(arr)
-            return LineCollection( arr )
+            from matplotlib.collections import LineCollection 
+            #linelist = []
+            points = self.array.reshape(-1, 1, 2)
+            segments= np.concatenate([points[:-1], points[1:]], axis=1)
+            
+            # for index in range(len(self.collection)-1):
+            #     linelist.append( [ self.collection[index].vec ,  self.collection[index+1].vec  ] )
+            # arr = np.array(linelist)
+            # if kwargs.get("removenans", False) :
+            #     arr = removenans(arr)
+            return LineCollection( segments ), segments
 
         def __getitem__(self, index):
             if isinstance(index,slice):
