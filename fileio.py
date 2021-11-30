@@ -134,7 +134,9 @@ class ConfigFile(TwoLayerDict):
             return array
 
         def ini_compat_json_dumps(_value):
-            return json.dumps(_value.replace("%","%%"))
+            if isinstance(value,str):
+                _value = _value.replace("%","%%")
+            return json.dumps(_value)
 
         self._create_sections()
         for section in self.keys():

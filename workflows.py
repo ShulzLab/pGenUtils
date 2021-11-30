@@ -63,7 +63,7 @@ class CachedVariables(ConfigFile):
 
                 - cache_dir_path (`str`):
                     path to the .ini file if you wish to save it in a custom location.
-                    By default, it will be saved in the LabUtils package, inside the __varcache__ folder.
+                    By default, it will be saved in the pGenUtils package, inside the __varcache__ folder.
 
                 - distinguisher (`str`):
                     Warning :
@@ -151,7 +151,11 @@ class CachedVariables(ConfigFile):
 
         if name_distinguisher != "" :
             name_distinguisher = '#' + name_distinguisher
-        self._filename = os.path.splitext( os.path.basename(inspect.stack()[1][1]) )[0] +"."+ inspect.stack()[1][3][1:-1] + name_distinguisher + ".ini"
+            
+        if kwargs.get("cache_filename") is not None :
+            self._filename = kwargs["cache_filename"]
+        else :
+            self._filename = os.path.splitext( os.path.basename(inspect.stack()[1][1]) )[0] +"."+ inspect.stack()[1][3][1:-1] + name_distinguisher + ".ini"
         self._dirname = cache_dir_path
         self._fullpath = os.path.join(self._dirname,self._filename)
 
@@ -228,6 +232,10 @@ class CachedVariables(ConfigFile):
             None.
         """
         pass
+    
+    #TODO : __getattr__ 
+    #__ setattr__ 
+    # based on getitem setitem, if no conflict with existing attributes
 
 def ProgressBarImage(Fraction):
     try :
