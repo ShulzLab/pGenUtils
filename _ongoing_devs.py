@@ -8,6 +8,9 @@ Created on Tue Feb 16 19:25:15 2021
 </div>
 """
 
+import cv2
+cv2.goodFeaturesToTrack
+
 from dataclasses import dataclass
 
 

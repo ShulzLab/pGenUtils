@@ -16,13 +16,55 @@ import shutil, pathlib
 from structs import TwoLayerDict
 import pathes
 
+class CustomUnpickler(_pickle.Unpickler):
 
+    def find_class(self, module, name):
+        """
+        Intercepts a call to pickle load and check namespace of loaded variables. If one matches the name in the case structure below, returns the object holding that function direfcly, without requiring the function to be defined in main of the calling program.
+        It overrides the function "find_class" of the pickle unpickler library.
 
+        Parameters
+        ----------
+        module : object
+            module_reference.
+        name : str
+            class_name.
 
+        Returns
+        -------
+        object : class_reference.
 
+        """
+        try:
+            return eval(name)
+        except NameError:
+            return super().find_class(module, name)
+        
+class CustomPickler(_pickle.Pickler):
+
+    def find_class(self, module, name):
+        """
+        Intercepts a call to pickle load and check namespace of loaded variables. If one matches the name in the case structure below, returns the object holding that function direfcly, without requiring the function to be defined in main of the calling program.
+        It overrides the function "find_class" of the pickle unpickler library.
+
+        Parameters
+        ----------
+        module : object
+            module_reference.
+        name : str
+            class_name.
+
+        Returns
+        -------
+        object : class_reference.
+
+        """
+        try:
+            return eval(name)
+        except NameError:
+            return super().find_class(module, name)
 
 class Pickle():
-
     def __init__(self,path):
         self.path = path
 
@@ -32,7 +74,7 @@ class Pickle():
             with open(self.path,"rb") as f :
                 while True :
                     try :
-                        results.append(_pickle.load(f))
+                        results.append(CustomUnpickler(f).load())
                     except EOFError :
                         break
                 return results if len(results) > 1 else results[0]
@@ -43,9 +85,9 @@ class Pickle():
         with open(self.path,"wb") as f :
             if isinstance(data, (list,tuple)) and not noiter:
                 for item in data :
-                    _pickle.dump(item,f)# protocol = _pickle.HIGHEST_PROTOCOL ?
+                    CustomPickler(f).dump(item)# protocol = _pickle.HIGHEST_PROTOCOL ?
                 return None
-            _pickle.dump(data,f)
+            CustomPickler(f).dump(data)
 
 class ConfigFile(TwoLayerDict):
     def __init__(self, path, **kwargs):
@@ -99,6 +141,11 @@ class ConfigFile(TwoLayerDict):
     def _read_if_changed(self):
         if self._filechanged :
             self._read()
+            
+    def pop(self,key):
+        retval = super().pop(key)
+        self._write()
+        return retval
 
     def __getitem__(self,index):
         self._read_if_changed()
@@ -107,10 +154,13 @@ class ConfigFile(TwoLayerDict):
         except KeyError as e:
             raise KeyError(f"Key and section pair may not exist in the config structure. Cannot access value. Key causing the issue : {e}")
 
-
     def __setitem__(self,key,value):
-        super().__setitem__(key,value)
+        TwoLayerDict.__setitem__(self,key,value)
         self._write()
+
+    def _clear_cfg(self):
+        for section in self.sections():
+            self.cfg.remove_section(section)
 
     def _create_sections(self):
         for section in self.keys():
@@ -137,21 +187,29 @@ class ConfigFile(TwoLayerDict):
             if isinstance(value,str):
                 _value = _value.replace("%","%%")
             return json.dumps(_value)
-
+        
+        self._write_callback()
+        self._clear_cfg()
         self._create_sections()
         for section in self.keys():
-            for param in super().__getitem__((section,slice(None))).keys():
+            for param in TwoLayerDict.__getitem__(self,(section,slice(None))).keys():
+    
                 value = jsonize_if_np_array(super().__getitem__((section,param)))
                 self.cfg.set(section,param,ini_compat_json_dumps(value))
         with open(self.path, 'w') as configfile:
             self.cfg.write(configfile)
 
+    def _write_callback(self):
+        pass
+    
     def _read(self):
         self.cfg.read(self.path)
         super().clear()
         for sec in self.sections():
-            super().__setitem__(sec , {param: self._getasvar(sec,param) for param in self.params(sec) } )
-
+            TwoLayerDict.__setitem__(self, sec , {param: self._getasvar(sec,param) for param in self.params(sec) } )
+        self.last_mtime =  os.stat(self.path).st_mtime
+ 
+        
     def _getasvar(self,section,param):
 
         def unjsonize_if_np_array(array):
@@ -183,6 +241,7 @@ class ConfigFile(TwoLayerDict):
     def _filechanged(self):
         try :
             filestatus =  os.stat(self.path).st_mtime
+
             if self.last_mtime is None or self.last_mtime != filestatus:
                 self.last_mtime = filestatus
                 return True

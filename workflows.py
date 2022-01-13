@@ -10,6 +10,8 @@ import warnings
 from datetime import datetime
 
 from fileio import ConfigFile
+from structs import TwoLayerDict
+
 import pathes
 
 try :
@@ -40,16 +42,55 @@ def get_currentfile_git_repo_metadata(input_path = None):
     return repo_data
     
 class CachedVariables(ConfigFile):
+    
+    
+    def _get_outside_caller_info(self):
+        """
+        Iteratively scans the caller's parents and stops at first encounter of a function coming from another file than this one (the deepest outside caller)
+        Returns it' file name and the function that "asked" for a raise if a module wasn't present.
+    
+        Returns:
+            dict
+    
+        """
+        start_depth = 2
+        for depth in range(start_depth,len(inspect.stack())):
+            #fullpath = inspect.stack()[depth][1]
+            fullpath = inspect.stack()[depth][0].f_code.co_filename
+            if not "__packages__" in fullpath:
+                try :#If caller is a classmethod
+                    caller_object = str(inspect.stack()[depth][0].f_locals["self"].__class__.__name__)+'.'+str(inspect.stack()[depth][0].f_code.co_name)
+                except KeyError :#if caller is a simple function
+                    caller_object = str(inspect.stack()[depth][3])
+                
+                return { "caller_function_name" : caller_object, "caller_file_name" : fullpath}
+        return { "caller_function_name" : "unknown", "caller_file_name" : "unknown"}
 
-    @property
+    def _add_meta_section(self,description):
+        self._section = "meta"
+        self._enter_var_init
+        self["creator_full_path"]= inspect.stack()[2][1]
+        self._enter_var_init
+        try :#If caller is a classmethod
+            self["creator_object"] = str(inspect.stack()[2][0].f_locals["self"].__class__.__name__)+'.'+str(inspect.stack()[2][0].f_code.co_name)
+        except KeyError :#if caller is a simple function
+            self["creator_object"] = inspect.stack()[2][3]
+        self._enter_var_init
+        self["creation_date"] = datetime.now().strftime("%y-%m-%d %H:%M:%S")
+        self._enter_var_init
+        self["description"] = description if description is not None else None
+        self._section = "current"
+
     def _add_readme_section(self):
+        self._section = "readme"
         self._enter_var_init
         self["help_section_current"] ="The current section contains the values of variables last used or currentely in use."
         self._enter_var_init
         self["help_section_meta"] = "The meta section contains information for you, reader, to determine if the file can be removed (very old last_used date) and by wich program it was used (caller_full_path and caller_object)"
         self._enter_var_init
         self["help_section_date#name"] = "The sections with names composed of a [date#name] are sections that contains saved cached variables values and that can be retrieved back in the current section by calling `retrieve` with a name or a date."
-
+        self._section = "current"
+        
     def __init__(self, **kwargs):
         """
         Handle file and ram representation of user selected current working variables
@@ -158,17 +199,11 @@ class CachedVariables(ConfigFile):
             self._filename = os.path.splitext( os.path.basename(inspect.stack()[1][1]) )[0] +"."+ inspect.stack()[1][3][1:-1] + name_distinguisher + ".ini"
         self._dirname = cache_dir_path
         self._fullpath = os.path.join(self._dirname,self._filename)
-
+        
         super().__init__(self._fullpath)
-        super().__setitem__(("meta","caller_full_path"),inspect.stack()[1][1])
-        super().__setitem__(("meta","caller_object"),inspect.stack()[1][3])
-        super().__setitem__(("meta","last_used"),datetime.now().strftime("%y-%m-%d %H:%M:%S"))
-        super().__setitem__(("meta","description"),kwargs["description"]) if kwargs.get("description") is not None else None
 
-        self._exit_var_init
-
-        self._section = "readme"
-        self._add_readme_section
+        self._add_readme_section()
+        self._add_meta_section(kwargs.get("description",None))
         self._section = "current"
 
         #CheckConfigFile(self.fullpath, self.section)
@@ -188,55 +223,78 @@ class CachedVariables(ConfigFile):
             return True
         return False
 
-    @property
-    def init(self):
-        self._enter_var_init
-        return self
+
+    
+    def _key_resolver(self,key):
+        if isinstance(key,(list,tuple)):
+            return key
+        return (self._section,key)
 
     def __getitem__(self, key):
         if self._is_init:
             self._exit_var_init
-        return super().__getitem__((self._section,key))
+        return super().__getitem__(self._key_resolver(key))
 
     def __setitem__(self, key, value):
         setkey = True
         if self._is_init :
             try :
-                super().__getitem__((self._section,key))
+                super().__getitem__(self._key_resolver(key))
                 setkey = False
             except :
                 setkey = True
             self._exit_var_init
         if setkey :
-            super().__setitem__((self._section,key),value)
-
-    def save(self):
-        """
-        Question:
-            TODO
-            Save function to save current values by putting them into a section named by date.
-            Could be usefull to make sets of parameters that have been saved and can be easily switched to X or Y config, for user interfaces in particular.
-
-        Returns:
-            None.
-        """
-        pass
-
-    def retrieve(self,date):
-        """
-        Question:
-            TODO
-            Retrieve function to load previous values by putting the section named by date if existing, into current section.
-
-        Returns:
-            None.
-        """
-        pass
+            super().__setitem__(self._key_resolver(key),value)
+            
+    def _write_callback(self):
+        self._update_timestamp()
     
-    #TODO : __getattr__ 
-    #__ setattr__ 
-    # based on getitem setitem, if no conflict with existing attributes
+    def _update_timestamp(self):
+        TwoLayerDict.__setitem__(self,("meta","last_used"),datetime.now().strftime("%y-%m-%d %H:%M:%S"))
+        call_info = self._get_outside_caller_info()
 
+        TwoLayerDict.__setitem__(self,("meta","last_caller_full_path"), call_info["caller_file_name"] )
+        TwoLayerDict.__setitem__(self,("meta","last_caller_objet"), call_info["caller_function_name"] )
+
+    @property
+    def init(self):
+        self._enter_var_init
+        return self
+    
+    def set_working_section(self,section):
+        self._section = section
+
+    def save(self,section = None):
+        """
+
+        """
+        sel_section = self._section if section is None else section
+        backup_section = datetime.now().strftime("%y%m%d") + "#" + sel_section
+        for key in self[sel_section,:].keys():
+            self[backup_section,key] = self[sel_section,key]
+        self.pop((sel_section,slice(None,None,None)))
+
+    def retrieve(self,date=None,section = None):
+        """
+
+        """
+        sel_section = self._section if section is None else section
+        backup_section = self._find_most_recent_backup(sel_section) if date is None else date + "#" + sel_section
+        for key in self[backup_section,:].keys():
+            self[sel_section,key] = self[backup_section,key]
+    
+    def _find_most_recent_backup(self,section):
+        dates = []
+        for sec in self.sections():
+            parts = sec.split("#")
+            if len(parts) == 1:
+                continue
+            if parts[1] == section:
+                dates.append(parts[0])
+        date = sorted(dates,key=lambda content : int(content),reverse = True)[0]
+        return date + "#" + section
+        
 def ProgressBarImage(Fraction):
     try :
         raise np("Numpy must be installed in order to use this function")
@@ -271,6 +329,10 @@ def singleton(cls):
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
     return getinstance
+
+class classproperty(property):
+    def __get__(self, cls, owner):
+        return classmethod(self.fget).__get__(None, owner)()
 
 if __name__ == "__main__" :
 

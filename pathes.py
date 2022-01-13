@@ -265,5 +265,13 @@ def BinarySearch(InputFolder,extension):
         print(e)
     return NewDirlist
 
+def open_explorer(path):
+    import subprocess
+    subpath , ext = os.path.splitext(path)
+    if subpath == path :
+        subprocess.Popen(r'explorer '+f'"{path}"')
+    else :
+        subprocess.Popen(r'explorer /select,'+f'"{path}"')
+
 if __name__ == "__main__":
     pass

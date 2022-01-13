@@ -59,6 +59,7 @@ class StaticSQLEngine(sql.engine.base.Engine):
 
        def __call__(self, *params):
            return self.parent.call_function(self.name,params)
+        
     
     def __init__(self,input_method):
 
