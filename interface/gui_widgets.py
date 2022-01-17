@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
+
 """Boilerplate:
-<EXCLUDE_MODULE_FROM_MKDOCSTRINGS>
+A one line summary of the module or program, terminated by a period.
+
+Rest of the description. Multiliner
+
+<div id = "exclude_from_mkds">
+Excluded doc
+</div>
+
+<div id = "content_index">
 
 <div id = "contributors">
-Created on Tue Feb 16 19:25:15 2021
+Created on Thu Aug 26 16:12:25 2021
 @author: Timothe
 </div>
 """
 
-import cv2
-cv2.goodFeaturesToTrack
-
-from dataclasses import dataclass
-
-
-@dataclass
-class Point:
-    x: float
-    y: float
-    z: float = 0.0
 
 import os, sys
 
@@ -56,15 +54,6 @@ from PyQt5 import QtWidgets as QrealWidgets
 from PyQt5.QtCore import Qt, Signal
 
 import numpy as np
-
-
-# -*- coding: utf-8 -*-
-
-"""
-Created on Tue Nov 24 22:19:51 2020
-
-@author: Timothe
-"""
 
 
 
@@ -593,12 +582,6 @@ def test_fig_cache(fig):
     return fig_cache
 
 
-    
-if __name__ is "__main__":
-
-
-    sys.exit()
-
 if __name__ == "__main__":
 
     # import LibUtils
@@ -652,4 +635,3 @@ if __name__ == "__main__":
     # sys.exit(qApp.exec_())
 
     Figure()
-    
