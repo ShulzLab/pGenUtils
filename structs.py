@@ -33,7 +33,7 @@ class sdict(dict):
             value = {}
         super(sdict, self).__init__(value)
         self._dyn_attrs = []
-        self._update_attrs()
+        #self._update_attrs()
 
     def _update_attrs(self):
         [ self.__delattr__(key) for key in self._dyn_attrs ]
@@ -99,26 +99,42 @@ class sdict(dict):
                 raise ValueError("A dictionnary must be provided when overwriting values with ':' slicing operator")
         else :
             raise TypeError(f"Unsupported indexer :{index}")
-        self._update_attrs()
+        #self._update_attrs()
 
     def update(self,*value):
         super().update(*value)
-        self._update_attrs()
+        #self._update_attrs()
 
-    class default_proxy():
+    class _default_proxy():
         """
         Just an empty class to fake a default condition equal to no other possible value the user could enter.
         (because we want to preserve None as a possible user value in this case)
         """
         pass
 
-    default_holder = default_proxy()
-    def pop(self,value,default = default_holder):
-        if not isinstance(default,sdict.default_proxy):
-            super().pop(value,default)
-        else :
-            super().pop(value)
-        self._update_attrs()
+    _default_holder = _default_proxy()#Placeholder for a "None" default arg value, to allow None or any other value as an optionnal argument
+    def pop(self,value,default = _default_holder):
+        _inner_default_holder = self._default_proxy()
+        local_super = super()
+        def _pop_helper(key,_default = _inner_default_holder):
+            if not isinstance(default,sdict._default_proxy):
+                return local_super.pop(key,default)
+            else :
+                return local_super.pop(key)
+                
+        if self._assert_index_single(value):
+            retval = _pop_helper(value,default)
+        elif self._assert_index_iter(value):
+            retval = {val:_pop_helper(val,default) for val in value}
+        elif self._assert_index_dict(value):
+            iterkeys = list(value.keys())
+            retval = {val:_pop_helper(val,value[val]) for val in iterkeys}
+        elif self._assert_index_dotslice(value):
+            iterkeys = list(self.keys())
+            retval = {val:_pop_helper(val,default) for val in iterkeys}
+            
+        #self._update_attrs()
+        return retval
 
     def __str__(self):
         return super().__str__()
@@ -170,7 +186,15 @@ class TwoLayerDict(sdict):
             else :
                 raise ValueError("TwoLayerDict is rigid and only supports two str indices")
         return index[0],index[1]
-
+    
+    
+    def pop(self, index):
+        outindex, inindex = self._assert_index(index)
+        newvalue = sdict(super().__getitem__(outindex))
+        retval = newvalue.pop(inindex)
+        TwoLayerDict.__setitem__(self,(outindex,slice(None)),newvalue)
+        return retval
+    
     def __getitem__(self,index):
         outindex, inindex = self._assert_index(index)
         return sdict(super().__getitem__(outindex))[inindex]
@@ -180,14 +204,13 @@ class TwoLayerDict(sdict):
         if super()._assert_index_single(outindex):
             temp = sdict()
             temp[inindex] = value
-            if outindex in self.keys() :
-                if super()._assert_index_dotslice(inindex):
-                    old =  {}
-                else :
-                    old = sdict(super().__getitem__(outindex))
-                super().__setitem__(outindex , {**old , **temp})
-            else :
+            if not outindex in self.keys() or super()._assert_index_dotslice(inindex):
+                temp = sdict()
+                temp[inindex] = value
                 super().__setitem__(outindex,temp)
+            else :
+                old = sdict(super().__getitem__(outindex))
+                super().__setitem__(outindex , {**old , **temp})
 
         elif super()._assert_index_dotslice(outindex):
             if super()._assert_index_dict(value):

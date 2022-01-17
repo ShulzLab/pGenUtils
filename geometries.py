@@ -216,6 +216,7 @@ else :
         def plt(self):
             return ( self.X , self.Y, 'o-' )
 
+    
 
     class UPointCollection():
 
@@ -231,6 +232,17 @@ else :
                 self.collection = []
                 for i in range(len(items_list)):
                     self.collection.append( UPoint( items_list[i] , Y[i] ) )
+                    
+        
+        def __len__(self):
+            return len(self.collection)
+                
+                    
+        def dist_time(self):
+            variation = []
+            for index in range(len(self.collection)-1):
+                variation.append( self.collection[index].distance( self.collection[index+1] ) )
+            return variation
 
         def append(self,point):
             self.collection.append(point)
