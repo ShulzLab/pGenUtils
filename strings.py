@@ -44,6 +44,7 @@ def format_date(date, **kwargs):
             raise ValueError(f"Date format preset {preset} not recognized")
             
     preset = kwargs.get("preset", "folder")
+    preset = "folder" if preset is None else preset
     out_format = kwargs.get("out_format", None)
     silent = kwargs.get("silent", False)
      
