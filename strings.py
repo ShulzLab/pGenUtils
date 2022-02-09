@@ -52,7 +52,7 @@ def format_date(date, **kwargs):
         date_time_obj = date
     else :
         #SEARCH FOR FORMAT TYPE FOLDER, HIRIS OR SQL
-        match = quick_regexp_multi(date,r"^(\d{2})?(\d{2}[-T_\.]?\d{2}[-T_\.]?\d{2})([-T _\.](\d{1,2}[- _\.:]\d{1,2}[- _\.:]\d{1,2}))?$", groupidxs = (1,3))
+        match = quick_regexp_multi(date,r"^(\d{2})?(\d{2}[-T_\.\\\/]?\d{2}[-T_\.\\\/]?\d{2})([-T _\.\\\/](\d{1,2}[- _\.:]\d{1,2}[- _\.:]\d{1,2}))?$", groupidxs = (1,3))
         if match : 
             if match[1] is None :
                 match[1] = "00:00:00"
@@ -70,6 +70,12 @@ def format_date(date, **kwargs):
             return False 
         raise ValueError("Input date string did not match any authorized format.")
         
+
+def alphabet(index,caps = False):
+    if caps :
+        return chr(ord('@')+int(index)+1)
+    else :
+        return chr(ord('`')+index+1)
 
 # list based functions
 def alphanum_sort(list_of_strings):

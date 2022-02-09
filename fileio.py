@@ -14,6 +14,7 @@ import shutil, pathlib
 #sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath("__filename__"))))
 #print(os.path.dirname(os.path.dirname(os.path.abspath("__name__"))))
 from structs import TwoLayerDict
+from workflows import get_all_working_vars, get_glob_varname
 import pathes
 
 class CustomUnpickler(_pickle.Unpickler):
@@ -40,6 +41,8 @@ class CustomUnpickler(_pickle.Unpickler):
         except NameError:
             return super().find_class(module, name)
         
+
+    
 class CustomPickler(_pickle.Pickler):
 
     def find_class(self, module, name):
@@ -88,6 +91,29 @@ class Pickle():
                     CustomPickler(f).dump(item)# protocol = _pickle.HIGHEST_PROTOCOL ?
                 return None
             CustomPickler(f).dump(data)
+            
+    
+    def glob_vardump(self,*variables):
+        saveable_struct = make_saveable_struct(*variables)
+        self.dump(saveable_struct)
+        
+    def glob_varload(self):
+        loaded_struct = self.load()
+        unwrap_saveable_struct(loaded_struct)
+    
+def make_saveable_struct(*argvars):
+    savestruct = {}
+    if len(argvars) == 0 :
+        argvars = get_all_working_vars()
+    for var in argvars :
+        savestruct[get_glob_varname(var)] = var
+    return savestruct
+
+def unwrap_saveable_struct(save_struct):
+    globalscope = vars(sys.modules["__main__"])    
+    for k,v in save_struct.items():
+        globalscope[k] = v    
+
 
 class ConfigFile(TwoLayerDict):
     def __init__(self, path, **kwargs):

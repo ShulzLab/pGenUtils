@@ -9,8 +9,8 @@ import os,sys,inspect
 import warnings
 from datetime import datetime
 
-from fileio import ConfigFile
 from structs import TwoLayerDict
+from strings import quick_regexp
 
 import pathes
 
@@ -40,7 +40,56 @@ def get_currentfile_git_repo_metadata(input_path = None):
         return None
     repo_data = {"file_called" : input_path,"path_on_disk":repo.git_dir, "name":repo.remotes.origin.url.split('.git')[0].split('/')[-1], "branch": repo.active_branch.name, "author": repo.remotes.origin.url.split('.git')[0].split('/')[-2], "commit": repo.active_branch.commit.hexsha, "commiter": repo.active_branch.commit.committer.name, "commiter_email": repo.active_branch.commit.committer.email}
     return repo_data
-    
+
+
+def get_all_working_vars():
+    import types
+    working_vars = []
+    globalscope = vars(sys.modules["__main__"])
+    varnames = list(globalscope.keys())
+    patterns = [r"^__.*$",r"^_.*$",r"^__.*__$"]#(leading or trailing underscores are used for private or reserved variables naming)
+    rejected_names = ["In","Out"]# variables defined by Ipython internally
+    ### Here we will test if variable match conditions, if so, we reject it, else, we keep it.
+    for var in varnames:
+        ### Is this a module or package
+        try :
+            globalscope[var].__package__
+            continue
+        except AttributeError:
+            pass
+        ### Is this a function
+        try :
+            globalscope[var].__module__
+            continue
+        except AttributeError:
+            pass
+        ### Is this a generator
+        if isinstance(globalscope[var],types.GeneratorType) :
+            continue
+        exit = False
+        ### Is this a rejected variable by name
+        if var in rejected_names :
+            continue
+        ### Is this a private or reserved variable (leading or trailing underscores)
+        for pattern in patterns :
+            if quick_regexp(var,pattern):
+                exit = True
+                break
+        if exit :
+            continue
+        
+        ### Hurray, we found one interesting variable, keeping it
+        print(var)
+        working_vars.append(globalscope[var])
+    return working_vars
+
+
+def get_glob_varname(var):
+    globalscope = vars(sys.modules["__main__"])
+    return [k for k,v in globalscope.items() if v is var][0]
+
+
+from fileio import ConfigFile
 class CachedVariables(ConfigFile):
     
     
