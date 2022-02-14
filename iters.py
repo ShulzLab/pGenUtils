@@ -11,11 +11,16 @@ Created on Mon Mar 30 17:48:42 2020
 def argmax(iterable):
     return max(enumerate(iterable), key=lambda x: x[1])[0]
 
-def unique_pairs(a,b):
+def unique_pairs(a,b,redundant = False):
     """Produce pairs of values from two iterables"""
+    seen = set()
     for i in a:
         for j in b:
-            yield i, j
+            pair = sorted([i, j])
+            if repr(pair) not in seen:
+                seen.add(repr(pair))
+                if pair[0] != pair[1] or redundant :
+                    yield pair
 
 def nest_iter(dimension,current_dimension=None,slicing = False,**kwargs):
     """
