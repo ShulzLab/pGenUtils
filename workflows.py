@@ -88,6 +88,12 @@ def get_glob_varname(var):
     globalscope = vars(sys.modules["__main__"])
     return [k for k,v in globalscope.items() if v is var][0]
 
+def get_main_filename():
+    globalscope = vars(sys.modules["__main__"])   
+    if "__filename__" in globalscope.keys():
+        return globalscope["__filename__"]
+    if "__name__" in globalscope.keys():
+        return globalscope["__filename__"]
 
 from fileio import ConfigFile
 class CachedVariables(ConfigFile):
