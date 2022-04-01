@@ -69,7 +69,7 @@ def format_date(date, **kwargs):
         if silent :
             return False 
         raise ValueError("Input date string did not match any authorized format.")
-        
+
 
 def alphabet(index,caps = False):
     if caps :
