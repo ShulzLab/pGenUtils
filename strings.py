@@ -135,7 +135,7 @@ def quick_regexp(input_line,regex,**kwargs):
         matches = re.finditer(regex, input_line, re.MULTILINE)
 
     groupidx = kwargs.get("groupidx",None)
-    matchid = kwargs.get("matchid",None)
+    matchid = kwargs.get("matchidx",None)
     if matchid is not None :
         matchid = matchid +1
 
