@@ -38,6 +38,14 @@ class StaticSQLEngine(sql.engine.base.Engine):
     """
     import mysql.connector.errors as mysql_cnx_errors 
 
+    
+    class _StaticSQLEngine__routines(object):
+        def __init__(self):
+            super().__init__()
+        
+        def add_routine(self,name,item):
+            self.__setattr__(name,item)
+        
     class _StaticSQLEngine__proc():
        """
        self.wrapped class for calling a procedure as an attribute
@@ -69,11 +77,17 @@ class StaticSQLEngine(sql.engine.base.Engine):
         
         _deps.assert_not_imported(pd)
         
+        self.routines = self.__routines()
+        
         for proc in list(pd.read_sql_query(f"SHOW PROCEDURE STATUS WHERE Db = '{self.default_schema}';",self)["Name"]):
-            self.__setattr__(proc,self.__proc(proc,self))
+            f_proc = self.__proc(proc,self)
+            self.__setattr__(proc,f_proc)
+            self.routines.add_routine(proc,f_proc)
             
         for func in list(pd.read_sql_query(f"SHOW FUNCTION STATUS WHERE Db = '{self.default_schema}';",self)["Name"]):
-            self.__setattr__(func,self.__func(func,self))
+            f_func = self.__func(func,self)
+            self.__setattr__(func,f_func)
+            self.routines.add_routine(func,f_func)
     
     def _call_sql_executeable(self,exec_type,function_name, params):
         
@@ -115,6 +129,8 @@ class StaticSQLEngine(sql.engine.base.Engine):
     def call_procedure(self,function_name, params):
         return self._call_sql_executeable("procedure",function_name, params)
     
+    def exquery(self,query,**kwargs):
+        return pd.read_sql_query(query,self,**kwargs)
     
     @property
     def default_schema(self):
@@ -122,6 +138,8 @@ class StaticSQLEngine(sql.engine.base.Engine):
             return self.dialect.default_schema_name
         except AttributeError: 
             return self.url.get_dialect()._get_default_schema_name(self.url.get_dialect(),self.connect())
+    
+
     
 
 def open_sql(input_method):

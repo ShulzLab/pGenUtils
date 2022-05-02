@@ -9,17 +9,29 @@ import sys, os, warnings
 from math import sin, cos, radians, pi, sqrt
 from statistics import mean
 
+
+import _dependancies as _deps
+
 try :
     from shapely.geometry import LineString
-except (ImportError, FileNotFoundError) as e:
-    warnings.warn(f"Shapely import failed Either not installed or some .dll files mising. You won't be able to use Trajectory_Window function. Original error : {e}")
-    LineString = e
+except ImportError as e :
+    LineString = _deps.default_placeholder("shapely",e)
+    _deps.dep_miss_warning(LineString)
 
 try :
     import numpy as np
 except ImportError as e :
-    warnings.warn("Numpy is not installed. You won't be able to use the Unified Geometry function : UPoint, Uline... etc")
-else :
+    np = _deps.default_placeholder("numpy",e)
+    _deps.dep_miss_warning(np)
+
+
+# try :
+#     from shapely.geometry import LineString
+# except (ImportError, FileNotFoundError) as e:
+#     warnings.warn(f"Shapely import failed Either not installed or some .dll files mising. You won't be able to use Trajectory_Window function. Original error : {e}")
+#     LineString = e
+
+
 #from matplotlib.collections import LineCollection # UNUSED
 
 #sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath("__filename__"))))

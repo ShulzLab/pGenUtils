@@ -69,7 +69,7 @@ def format_date(date, **kwargs):
         if silent :
             return False 
         raise ValueError("Input date string did not match any authorized format.")
-        
+
 
 def alphabet(index,caps = False):
     if caps :
@@ -135,7 +135,7 @@ def quick_regexp(input_line,regex,**kwargs):
         matches = re.finditer(regex, input_line, re.MULTILINE)
 
     groupidx = kwargs.get("groupidx",None)
-    matchid = kwargs.get("matchid",None)
+    matchid = kwargs.get("matchidx",None)
     if matchid is not None :
         matchid = matchid +1
 

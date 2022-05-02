@@ -5,6 +5,7 @@ Created on Mon Jun  7 15:43:06 2021
 @author: Timothe
 """
 
+import os
 
 ####### CUSTOM TYPES AND OBJECTS
 
@@ -286,6 +287,39 @@ class func_io_typematch():
         except Exception as e:
             raise TypeError(f"Cannot convert this specific type back.\nOriginal error : {e}")
             #return args if len(args)>1 else args[0]
+
+import _dependancies as _deps
+
+try :
+    import numpy as np
+except ImportError as e :
+    np = _deps.default_placeholder("numpy",e)
+    _deps.dep_miss_warning(np)
+
+class memarray(np.memmap):
+    def __new__(cls, input_array,**kwargs):
+        import random
+        rdir = kwargs.pop("root",os.path.abspath("memaps")) 
+        if not os.path.isdir(rdir):
+            os.makedirs(rdir)
+        while True :   
+            filename = os.path.join(rdir,"".join([ chr(65+int(random.random()*26)+int(random.random()+0.5)*32) for _ in range(10)]) + ".mmp")
+            if not os.path.isfile(filename):
+                break       
+                
+        memobj = super().__new__(cls, filename, shape = input_array.shape , mode = kwargs.pop("mode","w+"), **kwargs )
+        whole_slices = tuple([slice(None)]*len(input_array.shape))
+        memobj[whole_slices] = input_array[whole_slices]
+        
+        return memobj
+    
+    def close(self):
+        try :
+            self.flush()
+            if self._mmap is not None:
+                self._mmap.close()
+        except ValueError :
+            return
 
 
 if __name__ == "__main__" :

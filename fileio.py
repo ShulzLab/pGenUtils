@@ -14,7 +14,7 @@ import shutil, pathlib
 #sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath("__filename__"))))
 #print(os.path.dirname(os.path.dirname(os.path.abspath("__name__"))))
 from structs import TwoLayerDict
-from workflows import get_all_working_vars, get_glob_varname
+from workflows import get_all_working_vars, get_glob_varname, get_main_filename
 import pathes
 
 class CustomUnpickler(_pickle.Unpickler):
@@ -68,8 +68,21 @@ class CustomPickler(_pickle.Pickler):
             return super().find_class(module, name)
 
 class Pickle():
-    def __init__(self,path):
-        self.path = path
+    def __init__(self,path=None):
+        """
+        You can either enter a path (can be relative to current working dir)
+        or leave it blank and define global variable __filename__ in main.
+
+        Args:
+            path (TYPE, optional): DESCRIPTION. Defaults to None.
+
+        Returns:
+            None.
+
+        """
+        if path is None :
+            path = get_main_filename()+".vars"
+        self.path = os.path.abspath(path)
 
     def load(self):
         if os.path.isfile(self.path):
@@ -100,6 +113,12 @@ class Pickle():
     def glob_varload(self):
         loaded_struct = self.load()
         unwrap_saveable_struct(loaded_struct)
+        
+    def glob_varrun(self,force = False):
+        if os.path.isfile(self.path) and not force:
+            self.glob_varload()
+            return False
+        return True
     
 def make_saveable_struct(*argvars):
     savestruct = {}
@@ -112,8 +131,8 @@ def make_saveable_struct(*argvars):
 def unwrap_saveable_struct(save_struct):
     globalscope = vars(sys.modules["__main__"])    
     for k,v in save_struct.items():
-        globalscope[k] = v    
-
+        globalscope[k] = v
+        
 
 class ConfigFile(TwoLayerDict):
     def __init__(self, path, **kwargs):
