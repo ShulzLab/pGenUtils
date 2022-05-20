@@ -59,7 +59,7 @@ class StaticSQLEngine(sql.engine.base.Engine):
        
     class _StaticSQLEngine__func():
        """
-       self.wrapped class for calling a procedure as an attribute
+       self.wrapped class for calling a function as an attribute
        """
        def __init__(self , name , parent):
            self.parent = parent

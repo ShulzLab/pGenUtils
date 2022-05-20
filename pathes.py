@@ -269,9 +269,9 @@ def open_explorer(path):
     import subprocess
     subpath , ext = os.path.splitext(path)
     if subpath == path :
-        subprocess.Popen(r'explorer '+f'"{path}"')
+        subprocess.Popen(r'start '+f'"{path}"')
     else :
-        subprocess.Popen(r'explorer /select,'+f'"{path}"')
+        subprocess.Popen(r'explorer '+f'"{os.path.dirname(path)}",select,"{os.path.basename(path)}"')
 
 if __name__ == "__main__":
     pass
