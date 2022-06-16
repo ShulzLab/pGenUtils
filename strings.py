@@ -8,67 +8,8 @@ Created on Tue Mar 31 02:02:57 2020
 
 import re
 import numpy as np
-import datetime
 
 from structs import func_io_typematch
-
-
-def format_date(date, **kwargs):
-    '%Y-%m-%d %H:%M:%S'
-    def preset_folder():
-        return date_time_obj.strftime("%y%m%d")
-    
-    def preset_sqldate():
-        return date_time_obj.strftime("%Y-%m-%d")
-    
-    def preset_sqldatetime():
-        return date_time_obj.strftime("%Y-%m-%d %H:%M:%S")
-    
-    def preset_py_datetime():
-        return date_time_obj
-        
-    def selecter():
-        if preset == "folder" :
-            return preset_folder()
-        
-        elif preset == "sqldate" :
-            return preset_sqldate()
-        
-        elif preset == "sqldatetime" :
-            return preset_sqldatetime()
-        
-        elif preset == "py_datetime":
-            return preset_py_datetime()
-        
-        else :
-            raise ValueError(f"Date format preset {preset} not recognized")
-            
-    preset = kwargs.get("preset", "folder")
-    preset = "folder" if preset is None else preset
-    out_format = kwargs.get("out_format", None)
-    silent = kwargs.get("silent", False)
-     
-    if isinstance(date,datetime.datetime):
-        date_time_obj = date
-    else :
-        #SEARCH FOR FORMAT TYPE FOLDER, HIRIS OR SQL
-        match = quick_regexp_multi(date,r"^(\d{2})?(\d{2}[-T_\.\\\/]?\d{2}[-T_\.\\\/]?\d{2})([-T _\.\\\/](\d{1,2}[- _\.:]\d{1,2}[- _\.:]\d{1,2}))?$", groupidxs = (1,3))
-        if match : 
-            if match[1] is None :
-                match[1] = "00:00:00"
-            for i in [' ','-','_','.'] :
-                match[1] = match[1].replace(i,':')
-            for i in ['-','_','.'] :
-                match[0] = match[0].replace(i,'')
-                
-            date_time_obj = datetime.datetime.strptime(''.join(match),'%y%m%d%H:%M:%S')
-        
-    try : 
-        return selecter() if out_format is None else date_time_obj.strftime(out_format) 
-    except NameError :
-        if silent :
-            return False 
-        raise ValueError("Input date string did not match any authorized format.")
 
 
 def alphabet(index,caps = False):
