@@ -88,10 +88,10 @@ class UPoint():
             else :
                 raise TypeError("data not understood - with two parameters to UPoint, they are expected to both be real numbers")
         else :
-            if isinstance(x,np.ndarray):
-                self.vec = x
+            if isinstance(x,(np.ndarray,list)):
+                self.vec = np.array(x)
             elif isinstance(x, UPoint):
-                self.vec = np.array([x.x,x.y])
+                self.vec = np.array(x.vec)
             else :
                 raise TypeError("data not understood : Must be either an ndarray, an UPoint, or two real numbers")
 
@@ -162,10 +162,10 @@ class ULine():
             else :
                 raise Exception("data not understood - with two parameters to ULine, they are expected to both be a UPoint")
         else :
-            if isinstance(A,np.ndarray):
-                self.seg = A
+            if isinstance(A,(np.ndarray,list)):
+                self.seg = np.array(A)
             elif isinstance(A, ULine):
-                self.seg = np.stack([ A.A.vec , A.B.vec ])
+                self.seg = np.array(A.seg) 
             else :
                 raise Exception("data not understood : Must be either an ndarray, an Uline or two Upoints")
 
