@@ -86,14 +86,15 @@ class UPoint():
             if isinstance( x , (int,np.integer , float, np.floating)) and  isinstance( y , (int,np.integer , float, np.floating)) :
                 self.vec = np.array([x,y])
             else :
-                raise TypeError("data not understood - with two parameters to UPoint, they are expected to both be real numbers")
+                raise TypeError("data not understood - with two parameters to UPoint, they are expected to both be real or integer numbers")
         else :
-            if isinstance(x,(np.ndarray,list)):
-                self.vec = np.array(x)
-            elif isinstance(x, UPoint):
-                self.vec = np.array(x.vec)
-            else :
-                raise TypeError("data not understood : Must be either an ndarray, an UPoint, or two real numbers")
+            try : 
+                self.vec = x.vec
+            except (AttributeError, NameError) : 
+                try :
+                    self.vec = np.array(x)
+                except :
+                   raise TypeError("data not understood : Must be either an ndarray, an UPoint, or two real numbers")
 
     def distance(self,point):
         """
@@ -157,18 +158,18 @@ class ULine():
     def __init__(self,A,B = None):
 
         if B is not None :
-            if isinstance(A, UPoint) and isinstance(B, UPoint):
+            try : 
                 self.seg = np.stack([ A.vec , B.vec ])
-            else :
+            except (AttributeError, NameError) :
                 raise Exception("data not understood - with two parameters to ULine, they are expected to both be a UPoint")
         else :
-            if isinstance(A,(np.ndarray,list)):
-                self.seg = np.array(A)
-            elif isinstance(A, ULine):
-                self.seg = np.array(A.seg) 
-            else :
-                raise Exception("data not understood : Must be either an ndarray, an Uline or two Upoints")
-
+            try : 
+                self.seg = np.array(A.seg)
+            except (AttributeError, NameError) :
+                try : 
+                    self.seg = np.array(A)
+                except :
+                    raise Exception("data not understood : Must be either an ndarray, an Uline or two Upoints")
 
     @property
     def X(self):
@@ -634,7 +635,7 @@ def Means(A,B):#aray must be dimension  time : dimension 2 of size 2 x, y values
 
 
 def Trajectory_Window(Trajectory,window,height = None, **kwargs):
-    from extern import empty_df
+    from externs import empty_df
     """
     Functions that take a trajectory and returns a dataframe with the coordinates at wich the trajectory crossed a window, described by two points.
 
