@@ -9,6 +9,7 @@ Created on Mon Mar 30 20:44:51 2020
 import socket
 import platform
 import pathlib
+from sqlalchemy import text
 
 
 
@@ -79,15 +80,20 @@ class StaticSQLEngine(sql.engine.base.Engine):
         
         self.routines = self.__routines()
         
-        for proc in list(pd.read_sql_query(f"SHOW PROCEDURE STATUS WHERE Db = '{self.default_schema}';",self)["Name"]):
-            f_proc = self.__proc(proc,self)
-            self.__setattr__(proc,f_proc)
-            self.routines.add_routine(proc,f_proc)
-            
-        for func in list(pd.read_sql_query(f"SHOW FUNCTION STATUS WHERE Db = '{self.default_schema}';",self)["Name"]):
-            f_func = self.__func(func,self)
-            self.__setattr__(func,f_func)
-            self.routines.add_routine(func,f_func)
+        with self.connect() as conn:
+            proc_sql = text(f"SHOW PROCEDURE STATUS WHERE Db = '{self.default_schema}';")
+            proc_df = pd.read_sql_query(proc_sql, conn)
+            for proc in list(proc_df["Name"]):
+                f_proc = self.__proc(proc, self)
+                self.__setattr__(proc, f_proc)
+                self.routines.add_routine(proc, f_proc)
+
+            func_sql = text(f"SHOW FUNCTION STATUS WHERE Db = '{self.default_schema}';")
+            func_df = pd.read_sql_query(func_sql, conn)
+            for func in list(func_df["Name"]):
+                f_func = self.__func(func, self)
+                self.__setattr__(func, f_func)
+                self.routines.add_routine(func, f_func)
     
     def _call_sql_executeable(self,exec_type,function_name, params):
         
